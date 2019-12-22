@@ -1,0 +1,117 @@
+﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification\ 
+for details on configuring this project to bundle and minify static web assets. */
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Wrapping element */
+/* Set some basic padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Carousel */
+.carousel-caption p {
+    font-size: 20px;
+    line-height: 1.4;
+}
+
+/* Make .svg files in the carousel display properly in older browsers */
+.carousel-inner .item img[src$=".svg"] {
+    width: 100%;
+}
+
+/* QR code generator */
+#qrCode {
+    margin: 15px;
+}
+
+/* Hide/rearrange for smaller screens */
+@media screen and (max-width: 767px) {
+    /* Hide captions */
+    .carousel-caption {
+        display: none;
+    }
+}
+
+.bookItem {
+    border-radius: 10px;
+    border: 1px solid black;
+    padding: 5px;
+    margin-top: 5px;
+}
+
+.loader {
+    border: 10px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 10px solid #3498db;
+    width: 50px;
+    height: 50px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.rating-1, .rating-2, .rating-3, .rating-4, .rating-5 {
+    width: 100px;
+    height: 17px;
+    background: url(../images/rating.png);
+    background-repeat: no-repeat;
+    display: inline-block;
+}
+
+.rating-0 {
+    background-position: -155px -30px;
+}
+
+.rating-1 {
+    background-position: -155px -75px;
+}
+
+.rating-2 {
+    background-position: -155px -118px;
+}
+
+.rating-3 {
+    background-position: -155px -162px;
+}
+
+.rating-4 {
+    background-position: -155px -206px;
+}
+
+.rating-5 {
+    background-position: -155px -252px;
+}
+
+.cartDiv {
+    width: 200px;
+    position: fixed;
+    left: auto;
+    border: solid black 1px;
+    border-radius: 15px;
+    margin: 10px;
+    padding: 5px;
+}

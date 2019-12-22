@@ -1,0 +1,156 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="row">
+    <div class="col-md-9">
+        <div id="divBooks">
+
+        </div>
+        <div id="divLoader" style="display:block;width:50px;margin:0 auto;padding:5px;">
+            <div class="loader"></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="cartDiv">
+            <h3>Cart</h3>
+            <div id="divCartItems"></div>
+        </div>
+    </div>
+</div>
+
+<script id="cartItem-template" type="text/x-handlebars-template">
+    {{#CartItems}}
+    <div>
+        <hr />
+        <b>{{name}}</b>
+        <br />
+        <b>Quantity:</b> {{quantity}}
+        <br />
+        <b>Price:</b> ${{price}}
+        <br />
+        <button type="button" class="btn btn-danger" onclick="javascript: removeFromCart({{id}})">Remove</button>
+        <hr/>
+    </div>
+    {{/CartItems}}
+    <div><b>Total:</b> {{total}}</div>
+</script>
+
+<script id="book-template" type="text/x-handlebars-template">
+    <div class="row bookItem">
+        <div class="col-md-3">
+            <img src="images/Books/{{image}}" style="width:200px;height:300px;margin-top:30px;" />
+        </div>
+        <div class="col-md-9">
+            <h3><a href="">{{name}}</a></h3>
+            <hr />
+            <b>By: </b> {{author}}
+            <br />
+            <b>Price:</b> ${{price}}
+            <br />
+            <b>Rating:</b> <span class="rating-{{rating}}"></span>
+            <br />
+            <hr />
+            {{description}}
+
+            <hr />
+            <button type="button" class="btn btn-primary" onclick="javascript: addToCart({{id}}, '{{name}}', {{price}})">Add To Cart</button>
+            <span style="color:green;font-size:20px;">In Stock</span>
+            <hr />
+        </div>
+    </div>
+</script>
+
+<script>
+    let bookSource = document.querySelector("#book-template").innerHTML;
+    let cartItemSource = document.querySelector("#cartItem-template").innerHTML;
+    let pageNumber = 0;
+    window.addEventListener('DOMContentLoaded', load);
+
+    function load() {
+
+        let options = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 1.0
+        };
+
+        let callback = (entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    pageNumber++;
+                    loadBooks();
+                }
+            });
+        };
+
+        let observer = new IntersectionObserver(callback, options);
+        observer.observe(document.querySelector("#divLoader"));
+
+        refreshCartItems();
+    }
+
+    async function loadBooks() {
+        let $divBooks = $('#divBooks');
+        let template = Handlebars.compile(bookSource);
+        let observable = await getFetchObservable('api/Books/' + pageNumber);
+        observable.subscribe(data => {
+            let arraysource = rxjs.from(data);
+            arraysource.subscribe(book => {
+                $divBooks.append($(template(book)));
+            });
+        });
+    }
+
+    async function getFetchObservable(url) {
+        let response = await fetch(url);
+        let json = await response.json();
+        return rxjs.Observable.create(fetchObserver => {
+            fetchObserver.next(json);
+            fetchObserver.complete();
+        });
+    }
+
+    async function refreshCartItems() {
+        let $divCartItems = $('#divCartItems');
+        let template = Handlebars.compile(cartItemSource);      
+        let observable = await getFetchObservable('api/Cart');
+        observable.subscribe(data => {
+            let total = 0;
+            data.forEach(cartItem => {
+                total += parseFloat(cartItem.price);
+            });
+
+            $divCartItems.html($(template({ CartItems: data, total: '$' + total })));
+        });
+    }
+
+    async function addToCart(bookId, name, price) {
+        let cartItem = {
+            Id: bookId,
+            Name: name,
+            Price: price,
+            Quantity: 1
+        };
+
+        let data = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(cartItem)
+        };
+
+        let response = await fetch('api/Cart', data);
+        refreshCartItems();
+    }
+
+    async function removeFromCart(bookId) {
+        let data = {
+            method: 'DELETE'
+        };
+
+        let response = await fetch('api/Cart/' + bookId, data);
+        refreshCartItems();
+    }
+</script>
